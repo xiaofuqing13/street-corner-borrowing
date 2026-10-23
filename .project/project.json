@@ -13,11 +13,21 @@
     "screen_orientation": "portrait",
     "collection_type": "sce",
     "trial_note": "",
-    "app_platforms": "1,2"
+    "app_platforms": "1,2",
+    "app_id": 996788,
+    "miniapp_id": "tapmchuly7xstjuqbq",
+    "developer_id": 504536
   },
   "assets": {
     "icon": "",
     "screenshots": [],
     "promotional_image": ""
+  },
+  "test_qrcode": {
+    "url": "https://tapcode-sce.spark.xd.com/qrcode/m_dalf_1792768022238.png",
+    "generated_at": "2026-10-23T15:07:02.389Z"
+  },
+  "metadata": {
+    "updated_at": "2026-10-23T15:07:02.389Z"
   }
 }
