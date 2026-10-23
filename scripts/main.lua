@@ -4,8 +4,8 @@ local Content = require("content")
 local Game = require("game")
 local View = require("view")
 
--- 运行时存档不是构建资源，使用独立存档后缀。
-local SAVE_FILES = { "street_lending_a.sav", "street_lending_b.sav" }
+-- 内容为JSON；无扩展名的隔离存档槽位不是构建资产路径。
+local SAVE_FILES = { "street_lending_slot_a", "street_lending_slot_b" }
 local CLOUD_KEY = "street_lending_v1"
 local model_ = {
     screen = "home", profile = { records = {}, completed = 0, sound = true },
