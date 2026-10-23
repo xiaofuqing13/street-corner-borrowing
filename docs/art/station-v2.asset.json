@@ -1,0 +1,12 @@
+{
+  "tool": "generate_image",
+  "provider": "maker",
+  "model": "default",
+  "localPath": "assets/image/station-register-v2_20261023154401.png",
+  "previewUrl": "https://tapcode-sce.spark.xd.com/tapcode-images/5c0b332e-0a10-4e9e-b603-7243e1f978af.png",
+  "actualSize": "1536x1024",
+  "sha256": "480b0ca91cd3130f1f8665154885e78cd9c95084ee27e3f134971837c0b0b32f",
+  "prompt": "station-v2.prompt.md",
+  "metaGeneration": "generate_resource_meta",
+  "status": "已接入，待开发者手机视觉评审"
+}

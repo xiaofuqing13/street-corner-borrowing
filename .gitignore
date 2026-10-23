@@ -107,3 +107,7 @@ urhox-libs/
 .env
 .env.*
 /.maker-preview/
+
+# Local Runtime save slots
+/street_lending_slot_a
+/street_lending_slot_b

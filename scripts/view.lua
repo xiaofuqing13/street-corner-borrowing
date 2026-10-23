@@ -5,20 +5,17 @@ local Content = require("content")
 local View = {}
 
 local C = {
-    paper = { 246, 244, 237, 255 },
-    surface = { 255, 253, 247, 255 },
-    ink = { 38, 55, 51, 255 },
-    muted = { 104, 119, 112, 255 },
-    line = { 219, 226, 215, 255 },
-    green = { 37, 91, 77, 255 },
-    greenHover = { 49, 112, 96, 255 },
-    greenPressed = { 28, 70, 60, 255 },
-    mint = { 231, 240, 230, 255 },
-    disabled = { 224, 229, 220, 255 },
-    gold = { 157, 115, 53, 255 },
-    warm = { 248, 239, 219, 255 },
-    red = { 145, 72, 58, 255 },
-    white = { 255, 254, 247, 255 },
+    paper = { 246, 245, 239, 255 },
+    surface = { 252, 251, 246, 255 },
+    ink = { 34, 38, 33, 255 },
+    muted = { 94, 99, 92, 255 },
+    line = { 205, 207, 194, 255 },
+    green = { 48, 73, 58, 255 },
+    greenHover = { 61, 88, 70, 255 },
+    greenPressed = { 36, 58, 45, 255 },
+    disabled = { 225, 226, 217, 255 },
+    red = { 139, 56, 45, 255 },
+    white = { 252, 251, 246, 255 },
 }
 
 local ITEM_ORDER = { "umbrella", "cart" }
@@ -64,15 +61,15 @@ local function Row(children, options)
 end
 
 ---@param children Widget[]
-local function Card(children, options)
+local function Section(children, options)
     local props = {
         width = "100%",
-        backgroundColor = C.surface,
-        borderColor = C.line,
-        borderWidth = 1,
-        borderRadius = 18,
-        padding = 20,
-        gap = 12,
+        borderWidth = 0,
+        borderBottomWidth = 1,
+        borderBottomColor = C.line,
+        borderRadius = 0,
+        paddingVertical = 14,
+        gap = 10,
         flexShrink = 0,
         children = children,
     }
@@ -87,19 +84,24 @@ local function Button(text, onClick, secondary, disabled, options)
     local props = {
         text = text,
         width = "100%",
-        height = 54,
+        height = 52,
         minWidth = 0,
-        borderRadius = 12,
+        borderRadius = 2,
         fontSize = 14,
         fontWeight = "bold",
         paddingHorizontal = 14,
-        backgroundColor = secondary and C.mint or C.green,
-        hoverBackgroundColor = secondary and C.line or C.greenHover,
+        backgroundColor = secondary and C.paper or C.green,
+        hoverBackgroundColor = secondary and C.surface or C.greenHover,
         pressedBackgroundColor = secondary and C.disabled or C.greenPressed,
         disabledBackgroundColor = C.disabled,
         textColor = secondary and C.green or C.white,
         disabledTextColor = C.muted,
-        borderWidth = 0,
+        borderWidth = 1,
+        borderColor = secondary and C.line or C.green,
+        hoverBorderWidth = 1,
+        pressedBorderWidth = 1,
+        padding = { 0, 14, 0, 14 },
+        pressedPadding = { 0, 14, 0, 14 },
         boxShadow = false,
         hoverBoxShadow = false,
         pressedBoxShadow = false,
@@ -123,60 +125,28 @@ end
 local function SmallButton(text, onClick)
     return Button(text, onClick, true, false, {
         width = "auto",
-        height = 42,
+        height = 44,
         fontSize = 12,
         flexShrink = 1,
     })
 end
 
-local function Tag(text, dark)
+local function Illustration()
     return UI.Panel {
-        alignSelf = "flex-start",
-        paddingHorizontal = 10,
-        paddingVertical = 5,
-        borderRadius = 8,
-        backgroundColor = dark and { 27, 55, 47, 200 } or C.mint,
-        children = {
-            UI.Label {
-                text = text,
-                fontSize = 11,
-                fontWeight = "bold",
-                fontColor = dark and C.white or C.green,
-            },
-        },
+        width = "38%",
+        aspectRatio = 1.5,
+        backgroundImage = "image/station-register-v2_20261023154401.png",
+        backgroundFit = "contain",
+        borderRadius = 0,
+        flexShrink = 0,
     }
 end
 
-local function Hero(home)
-    return UI.Panel {
-        width = "100%",
-        aspectRatio = home and 2.15 or 3.25,
-        minHeight = home and 190 or 132,
-        backgroundImage = "image/station.png",
-        backgroundFit = "cover",
-        backgroundColor = C.green,
-        borderRadius = 20,
-        overflow = "hidden",
-        flexShrink = 0,
-        children = {
-            UI.Panel {
-                width = "100%",
-                height = "100%",
-                padding = 22,
-                justifyContent = "space-between",
-                backgroundGradient = {
-                    direction = "to-bottom",
-                    from = { 18, 45, 37, 10 },
-                    to = { 18, 45, 37, 175 },
-                },
-                children = {
-                    Tag(home and "雨天值班 · 16:00—19:00" or "借一点方便，留一点余地", true),
-                    Text(home and "街角借物所" or "雨还没停，邻里正好路过。",
-                        home and 29 or 17, C.white, true),
-                },
-            },
-        },
-    }
+local function Entry(label, value, accent)
+    return Row({
+        Text(label, 13, C.muted, false, { width = 88 }),
+        Text(value, 15, accent or C.ink, false, { width = 0, flexGrow = 1, flexBasis = 0 }),
+    }, { alignItems = "flex-start", gap = 10 })
 end
 
 local function PersonName(personId)
@@ -204,11 +174,11 @@ end
 local function PageHeading(title, subtitle, back)
     return UI.Panel {
         width = "100%",
-        gap = 10,
+        gap = 8,
         children = {
-            SmallButton("‹ 返回", back),
+            SmallButton("返回", back),
             Text(title, 24, C.ink, true),
-            Text(subtitle, 14, C.muted),
+            Text(subtitle, 13, C.muted),
         },
     }
 end
@@ -216,9 +186,9 @@ end
 local function Notice(model)
     local children = {}
     if model.notice and model.notice ~= "" then
-        children[#children + 1] = Text(model.notice, 14, C.green)
+        children[#children + 1] = Text(model.notice, 13, C.muted)
     elseif model.state and model.state.status ~= "" then
-        children[#children + 1] = Text(model.state.status, 14, C.green)
+        children[#children + 1] = Text(model.state.status, 13, C.muted)
     end
     if model.saveWarning and model.saveWarning ~= "" then
         children[#children + 1] = Text(model.saveWarning, 13, C.red)
@@ -226,65 +196,81 @@ local function Notice(model)
     if #children == 0 then
         return nil
     end
-    return UI.Panel { width = "100%", gap = 8, children = children }
+    return UI.Panel { width = "100%", gap = 6, paddingLeft = 10,
+        borderLeftWidth = 2, borderLeftColor = C.line, children = children }
 end
 
 local function Home(model, actions, body)
-    body:AddChild(Hero(true))
-    body:AddChild(Text("替邻里安排一把伞、一辆车的去处。\n看看稍后的来访，再决定现在借给谁。", 16))
+    body:AddChild(Row({
+        Text("社区便民站 / 借用登记", 12, C.muted, false, { width = 0, flexGrow = 1, flexBasis = 0 }),
+        SmallButton("设置", function() actions.show("settings") end),
+    }))
+    body:AddChild(Row({
+        UI.Panel {
+            width = 0, flexGrow = 1, flexBasis = 0, gap = 10,
+            children = {
+                Text("街角借物所", 26, C.ink, true),
+                Text("两把雨伞，一辆手推车。按时归还，再借给下一位。", 14),
+            },
+        },
+        Illustration(),
+    }))
     if model.state and not model.state.finished then
         local scenario = Content.GetScenario(model.state.scenarioId)
         if scenario then
-            body:AddChild(Card({
-                Tag("进行中的值班"),
-                Text(scenario.title .. " · " .. Game.Time(model.state.round), 17, C.ink, true),
+            body:AddChild(Section({
+                Text("进行中的值班", 12, C.red, true),
+                Entry("班次", scenario.title),
+                Entry("当前时间", Game.Time(model.state.round)),
                 Button("继续值班", actions.continueGame),
-            }, { backgroundColor = C.mint }))
+            }))
         else
-            body:AddChild(Text("进行中的班次暂时无法读取，请重新选择一个班次。", 14, C.red))
+            body:AddChild(Text("当前班次无法读取，请重新选择。", 14, C.red))
         end
     end
     body:AddChild(Row({
-        Text("选一个班次", 19, C.ink, true, { width = "auto", flexGrow = 1 }),
-        SmallButton("怎么玩", function() actions.show("rules") end),
+        Text("值班表", 18, C.ink, true, { width = 0, flexGrow = 1, flexBasis = 0 }),
+        SmallButton("规则", function() actions.show("rules") end),
     }))
     for index, scenario in ipairs(Content.scenarios) do
         local scenarioId = scenario.id
         local record = model.profile.records[scenarioId]
         ---@type Widget[]
         local children = {
-            Tag(string.format("%02d  /  %s", index, record and "已有值班记录" or "新的一个下午")),
-            Text(scenario.title, 20, C.ink, true),
-            Text(scenario.subtitle, 14, C.muted),
+            Row({
+                Text(string.format("%02d  %s", index, scenario.title), 18, C.ink, true,
+                    { width = 0, flexGrow = 1, flexBasis = 0 }),
+                SmallButton("开始", function() actions.start(scenarioId) end),
+            }),
+            Text("16:00—19:00 · " .. tostring(#scenario.requests) .. " 次来访", 13, C.muted),
         }
         if record then
-            local stars = math.floor(record.stars)
-            children[#children + 1] = Text(string.rep("★", stars)
-                .. string.rep("☆", 3 - stars) .. "  最佳 " .. tostring(record.best) .. " 次借用", 14, C.gold, true)
-            children[#children + 1] = Text("已尝试 " .. tostring(record.attempts) .. " 次", 12, C.muted)
+            children[#children + 1] = Text("最佳 " .. tostring(record.best) .. " 次借用 · "
+                .. tostring(record.stars) .. " 星 · 已值班 " .. tostring(record.attempts) .. " 次", 13, C.muted)
         end
-        children[#children + 1] = Button(record and "再值一次这个班" or "开始这个班次",
-            function() actions.start(scenarioId) end, true)
-        body:AddChild(Card(children))
+        body:AddChild(Section(children))
     end
-    body:AddChild(Row({
-        Text("已完成 " .. tostring(model.profile.completed) .. " 次值班", 12, C.muted,
-            false, { width = "auto", flexGrow = 1 }),
-        SmallButton("设置", function() actions.show("settings") end),
-    }))
+    body:AddChild(Text("累计完成 " .. tostring(model.profile.completed) .. " 次值班", 12, C.muted))
 end
 
 local function Inventory(state)
-    local cards = {}
+    local rows = {
+        Row({
+            Text("在所物品", 13, C.muted, false, { width = 0, flexGrow = 1, flexBasis = 0 }),
+            Text("可借", 12, C.muted, false, { width = 62, textAlign = "right" }),
+            Text("总数", 12, C.muted, false, { width = 62, textAlign = "right" }),
+        }),
+    }
     for _, itemId in ipairs(ITEM_ORDER) do
-        local available = state.stock[itemId]
-        cards[#cards + 1] = Card({
-            Text(ItemName(itemId), 14, C.muted),
-            Text(tostring(available) .. " 件可借", 22, available > 0 and C.green or C.muted, true),
-            Text("共 " .. tostring(Content.items[itemId].capacity) .. " 件", 12, C.muted),
-        }, { width = 0, flexGrow = 1, flexBasis = 0, padding = 16, gap = 5 })
+        rows[#rows + 1] = Row({
+            Text(ItemName(itemId), 16, C.ink, true, { width = 0, flexGrow = 1, flexBasis = 0 }),
+            Text(tostring(state.stock[itemId]), 16, state.stock[itemId] > 0 and C.ink or C.red, true,
+                { width = 62, textAlign = "right" }),
+            Text(tostring(Content.items[itemId].capacity), 14, C.muted, false,
+                { width = 62, textAlign = "right" }),
+        }, { paddingVertical = 5, borderTopWidth = 1, borderTopColor = C.line })
     end
-    return Row(cards, { alignItems = "stretch" })
+    return Section(rows, { gap = 6, paddingTop = 8, paddingBottom = 10 })
 end
 
 ---@param state BorrowGameState
@@ -302,9 +288,9 @@ local function UpcomingReturns(state)
         end
         return a.returnSlot < b.returnSlot
     end)
-    local children = { Text("稍后归还", 15, C.ink, true) }
+    local children = { Text("待归还", 14, C.ink, true) }
     if #loans == 0 then
-        children[#children + 1] = Text("目前没有借出的物品。", 13, C.muted)
+        children[#children + 1] = Text("暂无外借物品。", 13, C.muted)
     else
         for index, loan in ipairs(loans) do
             if index > 3 then break end
@@ -312,59 +298,51 @@ local function UpcomingReturns(state)
                 .. PersonName(loan.person) .. "归还" .. ItemName(loan.item), 13, C.muted)
         end
         if #loans > 3 then
-            children[#children + 1] = Text("其余归还安排可在完整预告中查看。", 12, C.muted)
+            children[#children + 1] = Text("其余记录见完整安排。", 12, C.muted)
         end
     end
-    return Card(children)
+    return UI.Panel { width = "100%", gap = 6, children = children }
 end
 
 local function Forecast(state, actions)
     local scenario = Content.GetScenario(state.scenarioId)
     if not scenario then
-        return Card({ Text("本班的到访预告暂时无法读取。", 14, C.red) })
+        return Text("到访预告暂时无法读取。", 14, C.red)
     end
     ---@type Widget[]
     local children = {
         Row({
-            Text("接下来的来访", 15, C.ink, true, { width = "auto", flexGrow = 1 }),
-            SmallButton("完整预告", function() actions.show("schedule") end),
+            Text("到访预告", 14, C.ink, true, { width = 0, flexGrow = 1, flexBasis = 0 }),
+            SmallButton("完整安排", function() actions.show("schedule") end),
         }),
     }
     local shown = 0
     for _, request in ipairs(scenario.requests) do
         if request.slot > state.round and shown < 2 then
             children[#children + 1] = Text(Game.Time(request.slot) .. "  "
-                .. PersonName(request.person) .. "想借" .. ItemName(request.item)
-                .. "，" .. Game.Time(request.returnSlot) .. "归还", 13, C.muted)
+                .. PersonName(request.person) .. "借" .. ItemName(request.item)
+                .. "（" .. Game.Time(request.returnSlot) .. "还）", 13, C.muted)
             shown = shown + 1
         end
     end
     if shown == 0 then
-        children[#children + 1] = Text("今天没有更晚的来访，19:00 清点归还。", 13, C.muted)
+        children[#children + 1] = Text("后面没有来访，19:00 清点归还。", 13, C.muted)
     end
-    return Card(children)
+    return UI.Panel { width = "100%", gap = 6, children = children }
 end
 
-local function RequestCard(state, request, actions)
+local function RequestSection(state, request, actions)
     local person = Content.people[request.person]
     local available = state.stock[request.item]
     local children = {
-        Tag("当前来访 · " .. person.role),
+        Text("当前来访", 12, C.red, true),
         Row({
-            UI.Panel {
-                width = 48, height = 48, borderRadius = 24,
-                backgroundColor = C.mint, alignItems = "center", justifyContent = "center",
-                children = { UI.Label { text = person.initial, fontSize = 19,
-                    fontWeight = "bold", fontColor = C.green } },
-            },
-            Text(person.name, 21, C.ink, true, { width = 0, flexGrow = 1, flexBasis = 0 }),
+            Text(person.name, 22, C.ink, true, { width = 0, flexGrow = 1, flexBasis = 0 }),
+            Text(person.role, 12, C.muted, false, { width = "auto" }),
         }),
-        Text(request.reason, 17),
-        UI.Panel {
-            width = "100%", padding = 14, borderRadius = 10, backgroundColor = C.mint,
-            children = { Text("借用" .. ItemName(request.item) .. "  ·  "
-                .. Game.Time(request.returnSlot) .. "归还", 14, C.green, true) },
-        },
+        Text(request.reason, 16),
+        Entry("借用", ItemName(request.item) .. " 1 " .. (request.item == "umbrella" and "把" or "辆")
+            .. "，" .. Game.Time(request.returnSlot) .. " 归还"),
         Row({
             Button("借出" .. ItemName(request.item), function() actions.lend(request.id) end,
                 false, available <= 0, { width = 0, flexGrow = 1, flexBasis = 0 }),
@@ -373,67 +351,60 @@ local function RequestCard(state, request, actions)
         }),
     }
     if available <= 0 then
-        children[#children + 1] = Text(ItemName(request.item)
-            .. "都借出去了，当前无法借出。可以先看看归还和到访预告，再决定这次是否婉拒。", 13, C.red)
+        children[#children + 1] = Text(ItemName(request.item) .. "暂无库存，本次无法借出。", 13, C.red)
     else
-        children[#children + 1] = Text("借出会占用一件库存，直到约定时刻归还。", 12, C.muted)
+        children[#children + 1] = Text("借出后，库存将在约定归还时刻恢复。", 12, C.muted)
     end
-    return Card(children, { borderColor = { 184, 205, 185, 255 }, padding = 22, gap = 16 })
+    return Section(children, { paddingTop = 10, gap = 12 })
 end
 
 local function Play(model, actions, body)
     local state = model.state
     local scenario = Content.GetScenario(state.scenarioId)
     if not scenario then
-        body:AddChild(Card({ Text("这份值班安排暂时无法读取，请回门口重新选择。", 15, C.red),
-            Button("回门口", actions.home) }))
+        body:AddChild(Section({ Text("班次无法读取，请重新选择。", 15, C.red),
+            Button("回到班次表", actions.home) }))
         return
     end
     body:AddChild(Row({
-        Text(scenario.title, 17, C.ink, true, { width = 0, flexGrow = 1, flexBasis = 0 }),
+        Text(scenario.title, 16, C.ink, true, { width = 0, flexGrow = 1, flexBasis = 0 }),
         SmallButton("规则", function() actions.show("rules") end),
-        SmallButton("门口", actions.home),
+        SmallButton("班次", actions.home),
     }))
-    body:AddChild(Hero(false))
     body:AddChild(Row({
-        Text(Game.Time(state.round), 27, C.green, true,
-            { width = "auto", flexGrow = 1 }),
-        Text("第 " .. tostring(math.min(state.round, 6)) .. " / 6 时刻", 13, C.muted,
+        Text(Game.Time(state.round), 27, C.ink, true, { width = "auto", flexGrow = 1 }),
+        Text("第 " .. tostring(math.min(state.round, 6)) .. " / 6 时段", 13, C.muted,
             false, { width = "auto" }),
     }))
+    body:AddChild(Inventory(state))
+    body:AddChild(Section({ UpcomingReturns(state), Forecast(state, actions) }, { gap = 10, paddingTop = 0 }))
     local request = Game.Current(state)
     if request then
-        body:AddChild(RequestCard(state, request, actions))
+        body:AddChild(RequestSection(state, request, actions))
     else
         local nextSlot = math.min(state.round + 1, 7)
-        body:AddChild(Card({
-            Tag("这一时刻已处理完"),
-            Text("先看看稍后的安排，再走向下一个时刻。", 16),
-            Button(nextSlot == 7 and "19:00 · 清点归还并收班"
+        body:AddChild(Section({
+            Text("本时段已处理完", 16, C.ink, true),
+            Button(nextSlot == 7 and "19:00 清点归还并收班"
                 or "前往 " .. Game.Time(nextSlot), actions.nextRound),
         }))
     end
-    body:AddChild(Text("手边的物品", 17, C.ink, true))
-    body:AddChild(Inventory(state))
-    body:AddChild(UpcomingReturns(state))
-    body:AddChild(Forecast(state, actions))
-    body:AddChild(Text("时间由你推进。读完、想好，再做决定。", 12, C.muted,
-        false, { textAlign = "center" }))
+    body:AddChild(Text("进入下一时段时，时间才会推进。", 12, C.muted))
 end
 
 local function Schedule(model, actions, body)
-    body:AddChild(PageHeading("今天的到访预告", "预告帮助安排库存。邻居到访时，再决定是否借出。",
+    body:AddChild(PageHeading("借还安排", "到访为预告，是否借出由你决定。",
         ReturnAction(model, actions)))
     if not model.state then
-        body:AddChild(Card({ Text("先从门口选择一个班次，就能查看这一天的安排。", 16),
-            Button("去选班次", actions.home) }))
+        body:AddChild(Section({ Text("选择班次后可查看安排。", 16),
+            Button("选择班次", actions.home) }))
         return
     end
     local state = model.state
     local scenario = Content.GetScenario(state.scenarioId)
     if not scenario then
-        body:AddChild(Card({ Text("这份到访预告暂时无法读取，请回门口重新选择班次。", 15, C.red),
-            Button("回门口", actions.home) }))
+        body:AddChild(Section({ Text("到访预告无法读取，请重新选择班次。", 15, C.red),
+            Button("回到班次表", actions.home) }))
         return
     end
     local decisions = {}
@@ -441,7 +412,8 @@ local function Schedule(model, actions, body)
         decisions[decision.requestId] = decision.lent and "已借出" or "已婉拒"
     end
     for slot = 1, 7 do
-        local children = { Text(Game.Time(slot), 19, C.green, true) }
+        local children = { Text(Game.Time(slot) .. (slot == state.round and "  当前" or ""),
+            17, slot == state.round and C.red or C.ink, true) }
         for _, loan in ipairs(state.loans) do
             if loan.returnSlot == slot then
                 children[#children + 1] = Text((loan.returned and "已归还  " or "将归还  ")
@@ -460,23 +432,23 @@ local function Schedule(model, actions, body)
             end
         end
         if slot == 7 then
-            children[#children + 1] = Text("只清点归还，停止借出，然后为今天做个小结。", 14, C.muted)
+            children[#children + 1] = Text("清点归还，不再借出。", 14, C.muted)
         end
-        body:AddChild(Card(children, { backgroundColor = slot == state.round and C.mint or C.surface }))
+        body:AddChild(Section(children))
     end
 end
 
 local function Rules(model, actions, body)
-    body:AddChild(PageHeading("借物所的小约定", "不用赶时间，先看清今天的安排。", ReturnAction(model, actions)))
+    body:AddChild(PageHeading("借用规则", "16:00 开始，19:00 收班。", ReturnAction(model, actions)))
     local rules = {
-        { "01  看见现在，也看看稍后", "雨伞有两把，手推车有一辆。到访预告公开可查，但只是预告；只有你确认借出，才会占用库存。" },
-        { "02  只有两种决定", "邻居到访时，选择借出，或这次不借。借出的物品会在约定时刻按时归还，归还后才能再借给别人。" },
-        { "03  时刻由你推进", "16:00 到 18:30 共六个时刻。处理完当前来访，点击下一个时刻；同一时刻先归还，再接待来访。阅读和思考不会消耗时间。" },
-        { "04  19:00 一起收班", "所有借用都要在 19:00 前或正好 19:00 归还。19:00 只清点归还，不再借出，也不延长营业。" },
-        { "05  留一点余地给后来的邻居", "尽量完成更多借用，也可以为稍后的来访保留物品。结束后查看自己的值班记录，再试另一种安排。" },
+        { "01  物品", "雨伞两把，手推车一辆。到访预告不预扣库存，确认借出后才扣减一件。" },
+        { "02  归还", "物品会在约定时刻归还。每个时段先归还，再接待来访；没有库存时不能借出。" },
+        { "03  来访", "邻居到访时，可以借出，也可以这次不借。处理完本时段的来访后，再进入下一时段。" },
+        { "04  时间", "16:00 到 18:30 共六个时段。阅读不会计时。所有物品最晚 19:00 归还，19:00 不再新借。" },
+        { "05  记录", "借出并归还后计为一次完成借用。尽量安排更多次周转，结算时查看次数和星级，也可以重新排班。" },
     }
     for _, rule in ipairs(rules) do
-        body:AddChild(Card({ Text(rule[1], 17, C.green, true), Text(rule[2], 15) }))
+        body:AddChild(Section({ Text(rule[1], 16, C.ink, true), Text(rule[2], 15) }))
     end
 end
 
@@ -487,47 +459,39 @@ local function Result(model, actions, body)
     end
     local scenario = Content.GetScenario(model.state.scenarioId)
     if not scenario then
-        body:AddChild(Card({ Text("这份值班小结暂时无法读取，可以回门口开始新的班次。", 15, C.red),
-            Button("回门口", actions.home) }))
+        body:AddChild(Section({ Text("班次记录无法读取，可以开始新的班次。", 15, C.red),
+            Button("选择班次", actions.home) }))
         return
     end
     local result = Game.Result(model.state)
-    local stars = math.floor(result.stars)
-    body:AddChild(Hero(false))
-    body:AddChild(Tag(scenario.title .. " · 值班小结"))
-    body:AddChild(Text(string.rep("★", stars) .. string.rep("☆", 3 - stars),
-        30, C.gold, true, { textAlign = "center" }))
-    body:AddChild(Text(result.title, 25, C.ink, true, { textAlign = "center" }))
-    body:AddChild(Text(result.message, 16, C.muted, false, { textAlign = "center" }))
-    body:AddChild(Card({
-        Text("今天完成了", 14, C.muted),
-        Text(tostring(result.completed) .. " 次借用", 29, C.green, true),
-        Text("帮到了 " .. tostring(result.neighbors) .. " 位邻居，婉拒了 "
-            .. tostring(result.declined) .. " 次来访。", 14),
-        Text("这个班次最多可安排 " .. tostring(result.maximum) .. " 次借用。", 12, C.muted),
-    }))
+    body:AddChild(Text("已收班", 13, C.red, true))
+    body:AddChild(Text(scenario.title, 25, C.ink, true))
+    body:AddChild(Text("19:00 / 本班借还登记", 13, C.muted))
+    body:AddChild(Section({
+        Entry("完成借用", tostring(result.completed) .. " 次"),
+        Entry("服务邻居", tostring(result.neighbors) .. " 位"),
+        Entry("未借出", tostring(result.declined) .. " 次"),
+        Entry("本班上限", tostring(result.maximum) .. " 次借用"),
+        Entry("星级", tostring(result.stars) .. " / 3", C.red),
+        Text(result.message, 13, C.muted),
+    }, { gap = 15 }))
     body:AddChild(Button("再值一次这个班", function() actions.start(scenario.id) end))
-    body:AddChild(Button("回门口选班次", actions.home, true))
-    body:AddChild(SmallButton("回顾今天的安排", function() actions.show("schedule") end))
+    body:AddChild(Button("选择其他班次", actions.home, true))
+    body:AddChild(SmallButton("查看借还记录", function() actions.show("schedule") end))
 end
 
 local function Settings(model, actions, body)
-    body:AddChild(PageHeading("借物所设置", "安静一点，或重新开始一段记录。", ReturnAction(model, actions)))
-    body:AddChild(Card({
-        Text("界面音效", 18, C.ink, true),
-        Text("借出、归还与收班时的轻提示。", 14, C.muted),
-        Button(model.profile.sound and "音效已开启 · 点击关闭" or "音效已关闭 · 点击开启",
+    body:AddChild(PageHeading("设置", "声音与值班记录。", ReturnAction(model, actions)))
+    body:AddChild(Section({
+        Text("操作音效", 17, C.ink, true),
+        Text("借出、归还、收班时播放提示音。", 14, C.muted),
+        Button(model.profile.sound and "音效已开启 · 关闭" or "音效已关闭 · 开启",
             actions.toggleSound, true),
     }))
-    body:AddChild(Card({
-        Text("重新整理记录", 18, C.ink, true),
-        Text("清除进行中的值班和班次纪录。操作前会再次确认。", 14, C.muted),
-        Button("清除进度…", actions.resetProgress, true, false, {
-            textColor = C.red,
-            backgroundColor = C.warm,
-            hoverBackgroundColor = { 241, 226, 202, 255 },
-            pressedBackgroundColor = { 232, 215, 191, 255 },
-        }),
+    body:AddChild(Section({
+        Text("清除记录", 17, C.ink, true),
+        Text("会清除进行中的值班和班次记录，操作前需再次确认。", 14, C.muted),
+        Button("清除进度", actions.resetProgress, true, false, { textColor = C.red, borderColor = C.red }),
     }))
 end
 
@@ -539,10 +503,10 @@ function View.Build(model, actions)
         width = "100%",
         maxWidth = 620,
         alignSelf = "center",
-        paddingHorizontal = 22,
-        paddingTop = 18,
+        paddingHorizontal = 24,
+        paddingTop = 20,
         paddingBottom = 32,
-        gap = 18,
+        gap = model.screen == "game" and 10 or 14,
     }
     local notice = Notice(model)
     if notice then

@@ -95,6 +95,37 @@ local function ApplyEnvelope(envelope)
     dirty_ = true
 end
 
+-- 只比较经校验后的存档内容，不依赖 JSON 对象的键顺序。
+local function SameProgress(remote)
+    if runId_ ~= remote.runId or recordedRun_ ~= remote.recordedRun
+        or model_.profile.sound ~= remote.profile.sound
+        or model_.profile.completed ~= remote.profile.completed then return false end
+    for _, scenario in ipairs(Content.scenarios) do
+        local current = model_.profile.records[scenario.id]
+        local received = remote.profile.records[scenario.id]
+        if not current or not received then
+            if current ~= received then return false end
+        elseif current.best ~= received.best or current.stars ~= received.stars
+            or current.attempts ~= received.attempts then return false end
+    end
+    local currentState = model_.state
+    local remoteState = remote.state
+    if not currentState or not remoteState then return currentState == remoteState end
+    local current = Game.Snapshot(currentState)
+    local received = Game.Snapshot(remoteState)
+    if not current or not received or current.scenarioId ~= received.scenarioId
+        or current.round ~= received.round or #current.decisions ~= #received.decisions then
+        return false
+    end
+    for index, decision in ipairs(current.decisions) do
+        local other = received.decisions[index]
+        if not other or decision.requestId ~= other.requestId or decision.lent ~= other.lent then
+            return false
+        end
+    end
+    return true
+end
+
 local function ReadLocal(path)
     if not fileSystem:FileExists(path) then return nil end
     local file = File(path, FILE_READ)
@@ -212,8 +243,10 @@ local function LoadCloud()
                 if stopped_ or generation ~= cloudGeneration_ or not cloudLoading_ then return end
                 local remote = type(values) == "table" and DecodeEnvelope(values[CLOUD_KEY]) or nil
                 cloudLoading_ = false
-                if sequence_ == initialSequence and remote and remote.sequence > sequence_ then
-                    if sequence_ > 0 then
+                local equalSequenceConflict = remote and remote.sequence == sequence_ and not SameProgress(remote)
+                if sequence_ == initialSequence and remote
+                    and (remote.sequence > sequence_ or equalSequenceConflict) then
+                    if sequence_ > 0 or equalSequenceConflict then
                         confirmation_ = { kind = "cloud", envelope = remote }
                         model_.notice = "发现另一份云端记录，请选择保留哪一份。"
                         dirty_ = true
@@ -452,7 +485,7 @@ function Stop()
     stopped_ = true
     cloudGeneration_ = cloudGeneration_ + 1
     UnsubscribeFromEvent("Update")
-    if not cloudLoading_ then Save() end
+    if not cloudLoading_ and not (confirmation_ and confirmation_.kind == "cloud") then Save() end
     UI.Shutdown()
     if audioScene_ then audioScene_:Dispose(); audioScene_ = nil end
     soundSource_ = nil

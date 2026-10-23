@@ -1,0 +1,5 @@
+"asset_id","relative_path","purpose","source","tool","prompt_record","width","height","sha256","status"
+"station-concept-v001","docs/art/reference/station-v1.png","主场景概念评审","原创AI生成","内置imagegen","docs/art/station-v1.prompt.md","1536","1024","3967e473828793bea040f7d6ba9f2cfe37cd63fc0ae1e183cff967a8a972b0fe","旧视觉记录，本轮弃用"
+"station-register-v2","assets/image/station-register-v2_20261023154401.png","登记簿版首页插画","原创AI生成","Maker generate_image，model=default","docs/art/station-v2.prompt.md","1536","1024","480b0ca91cd3130f1f8665154885e78cd9c95084ee27e3f134971837c0b0b32f","已接入；原生首页和450×800游玩排版检查通过；手机待验"
+"icon-release","assets/image/street-lending-icon-release_20261023162425.png","正式游戏图标","原创AI生成","Maker generate_image，model=default","docs/art/icon-release.prompt.md","1024","1024","4d9fa2e14cb07f86e7d052f5c071c12b7599842cf74eb95606374282600d676f","已通过后台素材选择，待最终提审"
+"cover-release","assets/image/street-lending-cover-release_20261023162835.png","正式商店宣传插画，非实机截图","原创AI生成","Maker generate_image，model=default","docs/art/cover-release.prompt.md","1920","1080","2463b0d5fa1b3adb18f660eb627cc213dfbd8c29fe11e6001c334f3ef31fd0da","原图已检查；另导出同尺寸JPEG供上传"
