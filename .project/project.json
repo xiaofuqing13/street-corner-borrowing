@@ -5,7 +5,7 @@
     "id": "1679979614"
   },
   "entry": "main.lua",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "taptap_publish": {
     "title": "街角借物所",
     "description": "在雨天的社区借物小站，安排两把伞和一辆手推车的借还。提前查看来访与归还时间，决定现在借给谁，为稍后的邻居留一点余地。",
@@ -24,10 +24,10 @@
     "promotional_image": ""
   },
   "test_qrcode": {
-    "url": "https://tapcode-sce.spark.xd.com/qrcode/m_dalf_1792768022238.png",
-    "generated_at": "2026-10-23T15:07:02.389Z"
+    "url": "https://tapcode-sce.spark.xd.com/qrcode/m_dalf_1792773494720.png",
+    "generated_at": "2026-10-23T16:38:14.865Z"
   },
   "metadata": {
-    "updated_at": "2026-10-23T15:07:02.389Z"
+    "updated_at": "2026-10-23T16:38:14.865Z"
   }
 }
