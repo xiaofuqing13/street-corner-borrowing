@@ -264,7 +264,7 @@ local function RequestPanel(state, request)
         Row({ Icon(request.item, false, 20), Text(ItemName(request.item) .. " 1 " .. (request.item == "umbrella" and "把" or "辆"),
             14, C.ink, true, { width = 0, flexGrow = 1, flexBasis = 0 }), Icon("return", false, 18),
             Text(Game.Time(request.returnSlot) .. " 归还", 13, C.green, true, { width = "auto" }) },
-            { id = "request-item-return", minHeight = 30, gap = 7, paddingVertical = 2 }) },
+            { id = "request-item-return", minHeight = 30, gap = 7, paddingVertical = 2, paddingHorizontal = 2 }) },
         { id = "current-request", borderLeftWidth = 3, borderLeftColor = Accent(state.scenarioId), padding = 18, gap = 14 })
     local key = state.scenarioId .. ":" .. Count(state.round) .. ":" .. request.id
     if key ~= lastRequestKey then
@@ -295,7 +295,8 @@ local function PlayFooter(model, actions)
             Button("借出" .. ItemName(request.item), function() actions.lend(request.id) end, false,
                 reason ~= "" or ad.busy, { id = "action-lend", width = 0, flexGrow = 1, flexBasis = 0 }, "check"),
             Button("这次不借", function() actions.decline(request.id) end, true, ad.busy,
-                { id = "action-decline", width = 0, flexGrow = 1, flexBasis = 0 }, "return") })
+                { id = "action-decline", width = 0, flexGrow = 1, flexBasis = 0 }, "return") },
+            { id = "play-main-actions", paddingHorizontal = 2 })
     else
         local nextSlot = math.min(state.round + 1, 7)
         children[#children + 1] = Button(nextSlot == 7 and "19:00 清点归还并收班" or "前往 " .. Game.Time(nextSlot),
@@ -349,7 +350,8 @@ local function Schedule(model, actions, body)
     for slot = 1, 7 do
         ---@type Widget[]
         local entries = { Row({ Icon("clock", false, 19), Text(Game.Time(slot) .. (slot == state.round and "  当前" or ""),
-            17, C.ink, true, { width = 0, flexGrow = 1, flexBasis = 0 }) }) }
+            17, C.ink, true, { width = 0, flexGrow = 1, flexBasis = 0 }) },
+            { id = "schedule-time-" .. Count(slot), minHeight = 30, paddingVertical = 2 }) }
         for _, loan in ipairs(state.loans) do
             if loan.returnSlot == slot then entries[#entries + 1] = Row({ Icon("return", false, 17),
                 Text(PersonName(loan.person) .. "归还" .. ItemName(loan.item) .. (loan.returned and " · 已归还" or ""),
@@ -360,8 +362,10 @@ local function Schedule(model, actions, body)
                 entries[#entries + 1] = Row({ Portrait(request.person, 34), Column({
                     Text(PersonName(request.person) .. "想借" .. ItemName(request.item)
                         .. (decisions[request.id] and (" · " .. decisions[request.id]) or ""), 14, C.ink, true),
-                    Text(request.reason, 12, C.muted), Text(Game.Time(request.returnSlot) .. " 归还", 11, C.muted) },
-                    { width = 0, flexGrow = 1, flexBasis = 0, gap = 3 }) }, { alignItems = "flex-start" })
+                    Text(request.reason, 12, C.muted, false, { marginTop = 3 }),
+                    Text(Game.Time(request.returnSlot) .. " 归还", 11, C.muted, false, { marginTop = 3 }) },
+                    { id = "schedule-request-" .. request.id, width = 0, flexGrow = 1, flexBasis = 0,
+                        gap = 0, paddingBottom = 2 }) }, { alignItems = "flex-start" })
             end
         end
         if slot == 7 then entries[#entries + 1] = Text("只收回物品，不再新借。", 13, C.muted) end
