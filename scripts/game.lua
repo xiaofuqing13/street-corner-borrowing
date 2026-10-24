@@ -4,7 +4,7 @@ local Game = {}
 local ITEM_IDS = { "umbrella", "cart" }
 local TIMES = { "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00" }
 local REQUEST_COUNT = 12
-local SAVE_VERSION = 1
+local SAVE_VERSION = 2
 
 ---@class BorrowDecision
 ---@field requestId string
@@ -31,6 +31,27 @@ local SAVE_VERSION = 1
 ---@field awaitingAdvance boolean
 ---@field status string
 ---@field statusKind string
+---@field freeReplans integer
+---@field rewardReplans integer
+
+---@class BorrowObjectiveProgress
+---@field id string
+---@field type string
+---@field title string
+---@field description string
+---@field current number
+---@field target integer
+---@field complete boolean
+
+---@class BorrowCompletedEntry
+---@field id string
+---@field text string
+
+---@class BorrowNeighborRecord
+---@field personId string
+---@field count number
+---@field requestIds string[]
+---@field entries BorrowCompletedEntry[]
 
 ---@class BorrowResult
 ---@field completed number
@@ -40,6 +61,8 @@ local SAVE_VERSION = 1
 ---@field stars number
 ---@field title string
 ---@field message string
+---@field objectives BorrowObjectiveProgress[]
+---@field neighborRecords BorrowNeighborRecord[]
 
 local function IsInteger(value, minimum, maximum)
     return type(value) == "number" and value % 1 == 0
@@ -130,6 +153,8 @@ function Game.New(scenarioId)
         awaitingAdvance = false,
         status = scenario.intro or "到访预告已经贴好，可以开始值班了。",
         statusKind = "info",
+        freeReplans = 0,
+        rewardReplans = 0,
     }
 end
 
@@ -229,9 +254,17 @@ end
 
 -- 仅重放决策；库存、归还、统计和历史都不从存档直接读入。
 function Game.Restore(snapshot)
-    if type(snapshot) ~= "table" or snapshot.version ~= SAVE_VERSION
+    if type(snapshot) ~= "table" or (snapshot.version ~= 1 and snapshot.version ~= SAVE_VERSION)
         or type(snapshot.scenarioId) ~= "string" or not IsInteger(snapshot.round, 1, 7) then
         return nil, "存档格式或版本不正确。"
+    end
+    local freeReplans, rewardReplans = 0, 0
+    if snapshot.version == SAVE_VERSION then
+        if not IsInteger(snapshot.freeReplans, 0, 1) or not IsInteger(snapshot.rewardReplans, 0, 1)
+            or snapshot.rewardReplans > snapshot.freeReplans then
+            return nil, "存档的重新安排次数不正确。"
+        end
+        freeReplans, rewardReplans = snapshot.freeReplans, snapshot.rewardReplans
     end
     local count = ArrayLength(snapshot.decisions, REQUEST_COUNT)
     if count == nil then return nil, "存档的请求记录不完整。" end
@@ -255,6 +288,7 @@ function Game.Restore(snapshot)
         local ok, errorMessage = Advance(state)
         if not ok then return nil, "存档无法恢复：" .. errorMessage end
     end
+    state.freeReplans, state.rewardReplans = freeReplans, rewardReplans
     return state
 end
 
@@ -267,6 +301,8 @@ function Game.Validate(state)
         scenarioId = state.scenarioId,
         round = state.round,
         decisions = state.decisions,
+        freeReplans = state.freeReplans,
+        rewardReplans = state.rewardReplans,
     })
     if not rebuilt then return false, message end
     for _, key in ipairs({ "cursor", "stock", "loans", "stats", "history", "finished", "awaitingAdvance" }) do
@@ -309,7 +345,111 @@ function Game.Snapshot(state)
         scenarioId = state.scenarioId,
         round = state.round,
         decisions = decisions,
+        freeReplans = state.freeReplans,
+        rewardReplans = state.rewardReplans,
     }
+end
+
+---@param state BorrowGameState
+---@param rewarded? boolean
+---@return boolean, string?
+function Game.CanReplan(state, rewarded)
+    local ok, message = Game.Validate(state)
+    if not ok then return false, message end
+    if rewarded ~= nil and type(rewarded) ~= "boolean" then
+        return false, "重新安排的来源不正确。"
+    end
+    if state.finished or state.round == 7 then return false, "已经收班，不能重新安排。" end
+    if #state.decisions == (state.round - 1) * 2 then
+        return false, "先处理本时段的一条请求，才需要重新安排。"
+    end
+    if rewarded then
+        if state.freeReplans == 0 then return false, "请先使用本班的免费重新安排。" end
+        if state.rewardReplans > 0 then return false, "本班的额外重新安排已经用过了。" end
+    elseif state.freeReplans > 0 then
+        return false, "本班的免费重新安排已经用过了。"
+    end
+    return true
+end
+
+-- 只撤回当前时段；重放不回退本班已用次数。
+---@param state BorrowGameState
+---@param rewarded? boolean
+---@return boolean, string?
+function Game.Replan(state, rewarded)
+    local ok, message = Game.CanReplan(state, rewarded)
+    if not ok then return false, message end
+    local decisions = {}
+    for index = 1, (state.round - 1) * 2 do
+        local decision = state.decisions[index]
+        if not decision then return false, "此前时段的选择记录不完整。" end
+        decisions[index] = { requestId = decision.requestId, lent = decision.lent }
+    end
+    local rebuilt, errorMessage = Game.Restore({
+        version = SAVE_VERSION, scenarioId = state.scenarioId, round = state.round,
+        decisions = decisions,
+        freeReplans = state.freeReplans + (rewarded and 0 or 1),
+        rewardReplans = state.rewardReplans + (rewarded and 1 or 0),
+    })
+    if not rebuilt then return false, errorMessage end
+    for key, value in pairs(rebuilt) do state[key] = value end
+    return true, "本时段的选择已撤回，可以从第一位街坊重新安排。"
+end
+
+---@param state BorrowGameState
+---@return BorrowObjectiveProgress[]
+function Game.Objectives(state)
+    local scenario = Content.GetScenario(state.scenarioId)
+    if not scenario then return {} end
+    local completed, neighbors, requestIds, people = 0, 0, {}, {}
+    for _, loan in ipairs(state.loans) do
+        if loan.returned then
+            completed = completed + 1
+            requestIds[loan.requestId] = true
+            if not people[loan.person] then
+                people[loan.person] = true
+                neighbors = neighbors + 1
+            end
+        end
+    end
+    local objectives = {}
+    for _, objective in ipairs(scenario.objectives) do
+        local current = 0
+        if objective.type == "completed" then current = completed
+        elseif objective.type == "neighbors" then current = neighbors
+        elseif objective.requestId and requestIds[objective.requestId] then current = 1 end
+        objectives[#objectives + 1] = {
+            id = objective.id, type = objective.type, title = objective.title,
+            description = objective.description, current = current,
+            target = objective.target, complete = current >= objective.target,
+        }
+    end
+    return objectives
+end
+
+---@param state BorrowGameState
+---@param scenario BorrowScenario
+---@return BorrowNeighborRecord[]
+local function NeighborRecords(state, scenario)
+    local records = {}
+    for _, personId in ipairs(Content.peopleOrder) do
+        ---@type BorrowNeighborRecord
+        local record = { personId = personId, count = 0, requestIds = {}, entries = {} }
+        for _, loan in ipairs(state.loans) do
+            if loan.returned and loan.person == personId then
+                for _, request in ipairs(scenario.requests) do
+                    if request.id == loan.requestId then
+                        record.count = record.count + 1
+                        record.requestIds[#record.requestIds + 1] = request.id
+                        record.entries[#record.entries + 1] = { id = request.id, text = request.returnText }
+                        break
+                    end
+                end
+            end
+        end
+        if record.count > 0 then records[#records + 1] = record end
+    end
+    return records
 end
 
 ---@param state BorrowGameState
@@ -320,6 +460,7 @@ function Game.Result(state)
         return {
             completed = 0, declined = 0, neighbors = 0, maximum = 0, stars = 0,
             title = "排班暂不可用", message = "无法核对这份排班，请返回首页重新读取记录。",
+            objectives = {}, neighborRecords = {},
         }
     end
     local completed = state.stats.returned
@@ -340,6 +481,8 @@ function Game.Result(state)
         maximum = maximum,
         stars = stars,
         title = title,
+        objectives = Game.Objectives(state),
+        neighborRecords = NeighborRecords(state, scenario),
         message = "完成借用 " .. completed .. " 次 / 本排班最多 " .. maximum
             .. " 次。完成 1 次得 1 星，完成 " .. secondStar .. " 次得 2 星，完成 "
             .. maximum .. " 次得 3 星。婉拒不扣道德分。",

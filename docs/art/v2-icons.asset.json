@@ -1,0 +1,80 @@
+{
+  "purpose": "v0.2游戏功能图标素材，待授权后接入",
+  "source": "本地原创SVG矢量绘制，无AI图片生成调用",
+  "count": 14,
+  "variants": 2,
+  "viewBox": "0 0 24 24",
+  "strokeWidth": 1.7,
+  "colors": [
+    "#30493a",
+    "#fcfbf6"
+  ],
+  "runtimeSource": "urhox-libs/UI/Widgets/Svg.lua",
+  "status": "28个SVG XML及官方资源meta JSON检查通过；浏览器实际预览显示完整；尚未接入游戏，Runtime集成验证待进行",
+  "icons": [
+    {
+      "id": "counter",
+      "label": "借物台"
+    },
+    {
+      "id": "people",
+      "label": "街坊"
+    },
+    {
+      "id": "schedule",
+      "label": "安排"
+    },
+    {
+      "id": "records",
+      "label": "记录"
+    },
+    {
+      "id": "clock",
+      "label": "时刻"
+    },
+    {
+      "id": "return",
+      "label": "归还"
+    },
+    {
+      "id": "replan",
+      "label": "重排"
+    },
+    {
+      "id": "video",
+      "label": "激励视频"
+    },
+    {
+      "id": "star",
+      "label": "目标"
+    },
+    {
+      "id": "check",
+      "label": "完成"
+    },
+    {
+      "id": "sound",
+      "label": "音效"
+    },
+    {
+      "id": "settings",
+      "label": "设置"
+    },
+    {
+      "id": "umbrella",
+      "label": "雨伞"
+    },
+    {
+      "id": "cart",
+      "label": "手推车"
+    }
+  ],
+  "evidence": {
+    "date": "2026-10-24",
+    "browserPreview": "docs/art/v2-icons-preview.jpg",
+    "previewSize": "1280x720",
+    "verified": "14款图标，墨绿和浅色版本，24/28/36像素示例显示完整",
+    "notVerified": "原生Runtime渲染、触摸命中、与按钮和导航的集成",
+    "officialMetaCount": 28
+  }
+}

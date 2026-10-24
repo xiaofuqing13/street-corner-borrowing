@@ -1,0 +1,268 @@
+{
+  "date": "2026-10-24",
+  "generator": "当前会话内置 image_gen",
+  "purpose": "街角借物所v0.2实际游戏素材",
+  "userDirection": "仅使用当前会话内置生图；人物与班次采用不同配色和绘画质感",
+  "processing": "只做面向手机的常规尺寸导出，完整原始图保留在生成目录；不做内容修图或替换",
+  "items": [
+    {
+      "id": "portrait-amei",
+      "transparent": false,
+      "prompt": "Use case: illustration-story. Asset: original in-game neighbor portrait for a Chinese community borrowing game called 街角借物所. Make a finished square 1024x1024 illustration of ONE ordinary adult neighbor, chest-up, three-quarter view, face readable at small mobile UI size, complete head with comfortable margins. Draw specific observed everyday features, expressive asymmetry, believable hands if present, tasteful brush marks and a human illustrator's deliberate simplification. Not a beauty-ad face, not generic glossy AI fantasy, not chibi, not photorealistic, no 3D. No text, numbers, emblems, logos, watermark, frames, or UI. Subject: 阿梅, about 34, a neighborhood pastry shop owner. Short slightly wavy black hair tied back loosely, warm round cheeks and alert eyes, practical cream shirt and faded terracotta apron, natural little smile after a busy afternoon. Color and medium: coral, toasted orange and pale butter yellow, matte gouache with lively pencil contours. Background: simple soft apricot shop-wall color with one restrained pale bread-shaped silhouette, not a detailed scene. Lighting: warm afternoon side light. A real ordinary shopkeeper, friendly without posing.",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a16852-5775-7811-aa4d-11716653143b\\exec-10ba6c04-eba8-4f9b-b553-4b20d346207d.png",
+      "output": "assets/image/v2/portrait-amei.png",
+      "originalSize": [
+        1254,
+        1254
+      ],
+      "runtimeSize": [
+        512,
+        512
+      ],
+      "alphaExtrema": null,
+      "bytes": 435546,
+      "sha256": "412719fa5348e4513a1bde05406de1705f5641f06f2f7609348ef16410d5d504"
+    },
+    {
+      "id": "portrait-laozhou",
+      "transparent": false,
+      "prompt": "Use case: illustration-story. Asset: original in-game neighbor portrait for a Chinese community borrowing game called 街角借物所. Make a finished square 1024x1024 illustration of ONE ordinary adult neighbor, chest-up, three-quarter view, face readable at small mobile UI size, complete head with comfortable margins. Draw specific observed everyday features, expressive asymmetry, believable hands if present, tasteful brush marks and a human illustrator's deliberate simplification. Not a beauty-ad face, not generic glossy AI fantasy, not chibi, not photorealistic, no 3D. No text, numbers, emblems, logos, watermark, frames, or UI. Subject: 老周, a community volunteer about 56, short salt-and-pepper hair, sun-browned skin and distinct crow's-feet, relaxed attentive expression. Wears a worn navy work jacket over a gray-blue polo, unbranded. Color and medium: indigo and mineral blue with warm ochre skin, loose dry watercolor and crisp charcoal-like contour. Background: light rainy sky blue with subtle irregular washes. Keep clothing folds and face grounded and modest.",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a16852-5775-7811-aa4d-11716653143b\\exec-74cd37e8-a207-45a2-9317-df625a8f0ead.png",
+      "output": "assets/image/v2/portrait-laozhou.png",
+      "originalSize": [
+        1254,
+        1254
+      ],
+      "runtimeSize": [
+        512,
+        512
+      ],
+      "alphaExtrema": null,
+      "bytes": 514155,
+      "sha256": "45fb6fadb6d90637f3ba2a6c139c63d5b2bf1b430be52b0ee540f56d22a2a7c7"
+    },
+    {
+      "id": "portrait-xiaolin",
+      "transparent": false,
+      "prompt": "Use case: illustration-story. Asset: original in-game neighbor portrait for a Chinese community borrowing game called 街角借物所. Make a finished square 1024x1024 illustration of ONE ordinary adult neighbor, chest-up, three-quarter view, face readable at small mobile UI size, complete head with comfortable margins. Draw specific observed everyday features, expressive asymmetry, believable hands if present, tasteful brush marks and a human illustrator's deliberate simplification. Not a beauty-ad face, not generic glossy AI fantasy, not chibi, not photorealistic, no 3D. No text, numbers, emblems, logos, watermark, frames, or UI. Subject: 小林, a young adult library-room caretaker about 27. Slim oval face, short neat black hair, small round dark glasses, thoughtful eyes, casual denim-blue shirt with sleeves folded. He gently holds the corner of one plain cloth-covered book close to his torso, natural proportioned hand if visible. Color and medium: periwinkle, dusty cobalt and warm pale paper, fine colored-pencil crosshatching with lightly painted shadows. Background simple pale lavender, few subtle organic pencil marks. Quiet curiosity, not a student in uniform.",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a16852-5775-7811-aa4d-11716653143b\\exec-0e7ad2d4-c872-4a9a-85c2-88a44fd284e3.png",
+      "output": "assets/image/v2/portrait-xiaolin.png",
+      "originalSize": [
+        1254,
+        1254
+      ],
+      "runtimeSize": [
+        512,
+        512
+      ],
+      "alphaExtrema": null,
+      "bytes": 494888,
+      "sha256": "0f53fe0b809ca8abde5ae412f3d4c0b3fc096a2a11f395cbe1f31ff97b546b1c"
+    },
+    {
+      "id": "portrait-chenshu",
+      "transparent": false,
+      "prompt": "Use case: illustration-story. Asset: original in-game neighbor portrait for a Chinese community borrowing game called 街角借物所. Make a finished square 1024x1024 illustration of ONE ordinary adult neighbor, chest-up, three-quarter view, face readable at small mobile UI size, complete head with comfortable margins. Draw specific observed everyday features, expressive asymmetry, believable hands if present, tasteful brush marks and a human illustrator's deliberate simplification. Not a beauty-ad face, not generic glossy AI fantasy, not chibi, not photorealistic, no 3D. No text, numbers, emblems, logos, watermark, frames, or UI. Subject: 陈叔, an experienced neighborhood repairman about 53. Broad slightly weathered face, close-cropped graying hair, thick eyebrows, a modest amused half-smile. Worn olive work overshirt with rolled cuffs and mustard undershirt, no uniform insignia. Color and medium: ochre, earthy olive and raw umber, tactile woodcut-inspired line shapes with flat muted gouache washes; still gentle realistic character drawing. Background pale sand with an abstract very faint tool-shelf shadow. No tools in his hands, no text.",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a16852-5775-7811-aa4d-11716653143b\\exec-13afdd23-7951-4095-a70b-c87ea3e3efcc.png",
+      "output": "assets/image/v2/portrait-chenshu.png",
+      "originalSize": [
+        1254,
+        1254
+      ],
+      "runtimeSize": [
+        512,
+        512
+      ],
+      "alphaExtrema": null,
+      "bytes": 443898,
+      "sha256": "638dc37fe3c960643e29c0107e5ba31a1d193a0c8d4cca2bb2c9c4256aca1273"
+    },
+    {
+      "id": "portrait-xiaotang",
+      "transparent": false,
+      "prompt": "Use case: illustration-story. Asset: original in-game neighbor portrait for a Chinese community borrowing game called 街角借物所. Make a finished square 1024x1024 illustration of ONE ordinary adult neighbor, chest-up, three-quarter view, face readable at small mobile UI size, complete head with comfortable margins. Draw specific observed everyday features, expressive asymmetry, believable hands if present, tasteful brush marks and a human illustrator's deliberate simplification. Not a beauty-ad face, not generic glossy AI fantasy, not chibi, not photorealistic, no 3D. No text, numbers, emblems, logos, watermark, frames, or UI. Subject: 小唐, a young adult flower shop worker about 25. Dark hair in a loose practical braid, slightly freckled nose, direct bright eyes, lively matter-of-fact expression. A faded teal cardigan and plum-red plain apron, with one small green leaf caught at the apron pocket. Color and medium: dusty rose, plum and jade accents, airy watercolor with visible ink line and small rough paper edges in paint, carefully drawn face. Background very pale rose, two restrained out-of-focus leaf shapes. No flower crown, no glamour makeup, no anime idol.",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a16852-5775-7811-aa4d-11716653143b\\exec-038ba43b-fa59-4759-a8cf-cbacb805b64c.png",
+      "output": "assets/image/v2/portrait-xiaotang.png",
+      "originalSize": [
+        1254,
+        1254
+      ],
+      "runtimeSize": [
+        512,
+        512
+      ],
+      "alphaExtrema": null,
+      "bytes": 486051,
+      "sha256": "34d9a54106c35feb069fc68c7db034301d4e7f7347b1acb70aee1fb90db57fee"
+    },
+    {
+      "id": "portrait-zhaoyi",
+      "transparent": false,
+      "prompt": "Use case: illustration-story. Asset: original in-game neighbor portrait for a Chinese community borrowing game called 街角借物所. Make a finished square 1024x1024 illustration of ONE ordinary adult neighbor, chest-up, three-quarter view, face readable at small mobile UI size, complete head with comfortable margins. Draw specific observed everyday features, expressive asymmetry, believable hands if present, tasteful brush marks and a human illustrator's deliberate simplification. Not a beauty-ad face, not generic glossy AI fantasy, not chibi, not photorealistic, no 3D. No text, numbers, emblems, logos, watermark, frames, or UI. Subject: 赵姨, a neighborhood resident about 65. Short softly curled gray-black hair, distinctive smile lines, kind but spirited expression, solid ordinary build. Light lilac knit vest over an off-white blouse, tiny plain scarf in muted mustard at neck. Color and medium: lilac, pale lavender and warm gold, soft colored-pencil drawing with pastel block colors, visible confident hand-drawn line. Background warm pale lilac with faint dappled window light. Avoid exaggerated wrinkles or cartoon elderly stereotypes.",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a16852-5775-7811-aa4d-11716653143b\\exec-c951cdbd-d3e3-4126-b218-ab9f32ee1df8.png",
+      "output": "assets/image/v2/portrait-zhaoyi.png",
+      "originalSize": [
+        1254,
+        1254
+      ],
+      "runtimeSize": [
+        512,
+        512
+      ],
+      "alphaExtrema": null,
+      "bytes": 466486,
+      "sha256": "2358eb374d331a559e75c8415f81faf1a2673855f4e21320b813f22d436de4c2"
+    },
+    {
+      "id": "item-umbrella",
+      "transparent": true,
+      "prompt": "Use case: illustration-story. Asset: a precise beautiful hand-painted inventory object illustration, 1024x1024 square, fully transparent background. ONE ordinary open compact rain umbrella, curved wooden handle, dull burnt-orange fabric canopy with one dusty blue panel, dark slender metal shaft. Three-quarter side view with canopy and entire handle visible, centered with generous margins. Watercolor and pencil, softly textured matte color, crisp silhouette readable at 72 px, plausible construction and proportions. No person, no scene, no floor shadow outside object, no lettering, no icon border, no frame, no logo, no watermark, no glow, no 3D, no checkerboard drawn in background.",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a16852-5775-7811-aa4d-11716653143b\\exec-c3c21dd8-5f0a-4c2c-9370-dce8036f431c.png",
+      "output": "assets/image/v2/item-umbrella.png",
+      "originalSize": [
+        1254,
+        1254
+      ],
+      "runtimeSize": [
+        512,
+        512
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ],
+      "bytes": 211945,
+      "sha256": "efede8e009e4b9ba19ef6cf8957441e8ead1c2cf27be8c132401fc5c6057cd4d"
+    },
+    {
+      "id": "item-cart",
+      "transparent": true,
+      "prompt": "Use case: illustration-story. Asset: a precise hand-illustrated community hand trolley inventory object, 1024x1024 square, fully transparent background. ONE empty compact two-wheel folding utility hand trolley, sturdy charcoal metal frame, brown rubber wheels with believable axle, muted blue-gray fabric backing and small dull brass joint details, slightly worn but clean. Standing open in three-quarter view, entire top handle and wheels visible with generous margins. Crisp ink drawing with dry watercolor, a more technical illustrative treatment than the soft umbrella art. Readable silhouette at 72 px. No boxes, no person, no scene, no lettering, no UI, no border, no watermark, no glossy 3D, no fake checkerboard.",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a16852-5775-7811-aa4d-11716653143b\\exec-89a12533-6e0f-4e84-bab0-fa9031c545c4.png",
+      "output": "assets/image/v2/item-cart.png",
+      "originalSize": [
+        1254,
+        1254
+      ],
+      "runtimeSize": [
+        512,
+        512
+      ],
+      "alphaExtrema": [
+        0,
+        255
+      ],
+      "bytes": 178912,
+      "sha256": "c518af72428d5148fff92fe60fa42c10a28de17b7e2abfa160889adc679ff539"
+    },
+    {
+      "id": "shift-first-rain",
+      "transparent": false,
+      "prompt": "Use case: illustration-story. Asset: finished landscape 1536x1024 chapter illustration for an independent mobile text-and-scheduling game set around an everyday Chinese neighborhood lending window. Create an original scene with clear composition and lived-in observations, expressive economical drawing, deliberate material texture and meaningful objects. This is standalone art, not a screenshot and not a collage. No written words, letters, numbers, signage, logos, UI, watermark, decorative slogans. Keep main activity and objects legible when displayed as a compact wide mobile header. Avoid glossy 3D, plastic skin, oversaturated fantasy, excessive cinematic glow, and generic AI symmetry. Scene: first rain of a spring afternoon, view from outside into a small neighborhood borrowing counter. A vivid rust-orange umbrella leans near a blue-gray rolling shutter; shallow puddles, washed blue paving stones, a small open register and simple steel trolley. One bakery neighbor approaching in the mid-distance, no portrait closeup. Atmosphere: fresh light rain, cool blue and turquoise contrasted with one warm umbrella. Medium: loose transparent watercolor over lively graphite drawing, paper grain visible, asymmetrical intimate composition.",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a16852-5775-7811-aa4d-11716653143b\\exec-41a91ea9-9bc4-48df-9775-1f6901a21bf1.png",
+      "output": "assets/image/v2/shift-first-rain.png",
+      "originalSize": [
+        1536,
+        1024
+      ],
+      "runtimeSize": [
+        768,
+        512
+      ],
+      "alphaExtrema": null,
+      "bytes": 917809,
+      "sha256": "d113aced062e057f9d5f314bafd06e764274dc020de63233bc37cef5872d0318"
+    },
+    {
+      "id": "shift-between-showers",
+      "transparent": false,
+      "prompt": "Use case: illustration-story. Asset: finished landscape 1536x1024 chapter illustration for an independent mobile text-and-scheduling game set around an everyday Chinese neighborhood lending window. Create an original scene with clear composition and lived-in observations, expressive economical drawing, deliberate material texture and meaningful objects. This is standalone art, not a screenshot and not a collage. No written words, letters, numbers, signage, logos, UI, watermark, decorative slogans. Keep main activity and objects legible when displayed as a compact wide mobile header. Avoid glossy 3D, plastic skin, oversaturated fantasy, excessive cinematic glow, and generic AI symmetry. Scene: the rain has just paused. At a community borrowing window, sunlight falls through ginkgo leaves on an open register, damp yellow-green foliage outside, two umbrellas drying near a wall, a folding cart returned by a neighbor seen from behind. Color: fresh yellow-green, pale cream and clean cerulean shadows, brighter and lighter than a rainy scene. Medium: observed colored-pencil drawing with broad flat gouache shapes and warm paper, charming everyday animation-background feeling without copying any franchise.",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a16852-5775-7811-aa4d-11716653143b\\exec-f2865b9f-f6e1-42c0-9596-b67eb9b35310.png",
+      "output": "assets/image/v2/shift-between-showers.png",
+      "originalSize": [
+        1536,
+        1024
+      ],
+      "runtimeSize": [
+        768,
+        512
+      ],
+      "alphaExtrema": null,
+      "bytes": 831602,
+      "sha256": "65f62b5c7de4a14381d3c9e051e8acc8820d919e3c4e3b3eb249b9bc3e0381d3"
+    },
+    {
+      "id": "shift-lamplight",
+      "transparent": false,
+      "prompt": "Use case: illustration-story. Asset: finished landscape 1536x1024 chapter illustration for an independent mobile text-and-scheduling game set around an everyday Chinese neighborhood lending window. Create an original scene with clear composition and lived-in observations, expressive economical drawing, deliberate material texture and meaningful objects. This is standalone art, not a screenshot and not a collage. No written words, letters, numbers, signage, logos, UI, watermark, decorative slogans. Keep main activity and objects legible when displayed as a compact wide mobile header. Avoid glossy 3D, plastic skin, oversaturated fantasy, excessive cinematic glow, and generic AI symmetry. Scene: before closing, a small community lending counter at early evening. One warm desk lamp lights an open register and a pencil, two neatly returned umbrellas and the trolley at side, indigo dusk visible outside with a few ordinary apartment windows softly lit. No dramatic fantasy light. Color: deep slate indigo, honey amber and muted brick, quiet strong value composition. Medium: intimate matte gouache, dry-brush texture and thin pen lines, painterly but precise everyday objects.",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a16852-5775-7811-aa4d-11716653143b\\exec-4020e045-6ade-492f-96b0-13335663770a.png",
+      "output": "assets/image/v2/shift-lamplight.png",
+      "originalSize": [
+        1536,
+        1024
+      ],
+      "runtimeSize": [
+        768,
+        512
+      ],
+      "alphaExtrema": null,
+      "bytes": 714940,
+      "sha256": "8033897a9dea417092bc45fe66f41f82d0ef296f9f3d2dc46d977b56d9ce1a22"
+    },
+    {
+      "id": "shift-book-relay",
+      "transparent": false,
+      "prompt": "Use case: illustration-story. Asset: finished landscape 1536x1024 chapter illustration for an independent mobile text-and-scheduling game set around an everyday Chinese neighborhood lending window. Create an original scene with clear composition and lived-in observations, expressive economical drawing, deliberate material texture and meaningful objects. This is standalone art, not a screenshot and not a collage. No written words, letters, numbers, signage, logos, UI, watermark, decorative slogans. Keep main activity and objects legible when displayed as a compact wide mobile header. Avoid glossy 3D, plastic skin, oversaturated fantasy, excessive cinematic glow, and generic AI symmetry. Scene: community reading room on an afternoon with a book exchange underway, looking across a small wheeled hand trolley toward a low shelf. Several plain cloth-bound books without text, a canvas tote, an umbrella drying near an open window; an adult caretaker carries a modest stack, seen from side in mid-distance. Color: periwinkle, cobalt, soft lavender, warm birch wood, one coral cloth accent. Medium: meticulous fine colored-pencil illustration with gentle watercolor shading and selective hatching. Human scale, purposeful details, uncluttered.",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a16852-5775-7811-aa4d-11716653143b\\exec-de7514a0-f10e-4e0d-8f5b-7df1eb864e62.png",
+      "output": "assets/image/v2/shift-book-relay.png",
+      "originalSize": [
+        1536,
+        1024
+      ],
+      "runtimeSize": [
+        768,
+        512
+      ],
+      "alphaExtrema": null,
+      "bytes": 787040,
+      "sha256": "9b7319c7f96e5cb708ac82f7c95f7d6ad0f058bbb171cdc5f7c622c8555dd143"
+    },
+    {
+      "id": "shift-market-prep",
+      "transparent": false,
+      "prompt": "Use case: illustration-story. Asset: finished landscape 1536x1024 chapter illustration for an independent mobile text-and-scheduling game set around an everyday Chinese neighborhood lending window. Create an original scene with clear composition and lived-in observations, expressive economical drawing, deliberate material texture and meaningful objects. This is standalone art, not a screenshot and not a collage. No written words, letters, numbers, signage, logos, UI, watermark, decorative slogans. Keep main activity and objects legible when displayed as a compact wide mobile header. Avoid glossy 3D, plastic skin, oversaturated fantasy, excessive cinematic glow, and generic AI symmetry. Scene: a flower seller and a pastry shop neighbor preparing their small street stalls for an evening market, making practical use of one folding hand trolley and a borrowed umbrella. Lived-in tiled storefront edge, baskets with a few seasonal blooms, blank fabric awning, ordinary street. No readable labels. Color: joyful dusty rose, apricot, leaf green and cream, stronger colorful accents than the other chapters. Medium: hand-cut colored paper and gouache-inspired editorial illustration with irregular cut edges, delicate drawn details, believable people and objects rather than flat clipart.",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a16852-5775-7811-aa4d-11716653143b\\exec-9fc49db3-3c1d-461a-9fae-3fc6962df876.png",
+      "output": "assets/image/v2/shift-market-prep.png",
+      "originalSize": [
+        1536,
+        1024
+      ],
+      "runtimeSize": [
+        768,
+        512
+      ],
+      "alphaExtrema": null,
+      "bytes": 824730,
+      "sha256": "1bdb618a72935f5967cffbad6707a1f07f83cb5c774b45bd6bf639b5ffa9f35a"
+    },
+    {
+      "id": "shift-evening-rounds",
+      "transparent": false,
+      "prompt": "Use case: illustration-story. Asset: finished landscape 1536x1024 chapter illustration for an independent mobile text-and-scheduling game set around an everyday Chinese neighborhood lending window. Create an original scene with clear composition and lived-in observations, expressive economical drawing, deliberate material texture and meaningful objects. This is standalone art, not a screenshot and not a collage. No written words, letters, numbers, signage, logos, UI, watermark, decorative slogans. Keep main activity and objects legible when displayed as a compact wide mobile header. Avoid glossy 3D, plastic skin, oversaturated fantasy, excessive cinematic glow, and generic AI symmetry. Scene: last neighborhood rounds near sunset, view along a narrow residential lane toward a lending window. An older woman and a volunteer seen at comfortable mid-distance returning a small folding cart, a pair of umbrellas by the wall, worn brick and potted plants, one small porch light. Color: muted burnt sienna, mauve evening sky, warm ochre stone and desaturated teal shadows. Medium: gently textured linocut-inspired ink contours with softly painted dusk washes, poetic but concrete everyday scene, no romanticized fantasy, no dense detail.",
+      "source": "C:\\Users\\Administrator\\.codex\\generated_images\\01a16852-5775-7811-aa4d-11716653143b\\exec-e34b8027-4240-4a1b-a0b5-2f56c0f1d581.png",
+      "output": "assets/image/v2/shift-evening-rounds.png",
+      "originalSize": [
+        1536,
+        1024
+      ],
+      "runtimeSize": [
+        768,
+        512
+      ],
+      "alphaExtrema": null,
+      "bytes": 800005,
+      "sha256": "d75ffb892b4567cee89a25c4ece2e2e4dba6b429132f8d0e285523f1c76ddc5e"
+    }
+  ],
+  "status": "14张内置生图成功，已检查原图内容并导出运行时尺寸；待原生UI集成验收"
+}

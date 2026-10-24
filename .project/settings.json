@@ -28,8 +28,7 @@
       "enabled": false
     },
     "ad": {
-      "status": 0,
-      "url": "https://developer.taptap.cn/forge/504536/app/996788/operation/ad-monetization",
+      "status": 1,
       "ad_spaces": [
         {
           "id": "1054323",
@@ -41,7 +40,7 @@
         }
       ],
       "top_on_placements": [],
-      "synced_at": "2026-10-23T15:58:44.978Z"
+      "synced_at": "2026-10-24T05:14:09.370Z"
     }
   }
 }

@@ -3,14 +3,41 @@ local UI = require("urhox-libs/UI")
 local Content = require("content")
 local Game = require("game")
 local View = require("view")
+local Ads = require("ads")
+
+---@class LendingProfile
+---@field records table
+---@field completed integer
+---@field sound boolean
+---@field objectives table
+---@field neighbors table
+---@field tutorialSeen boolean
+---@field lastRewardAt integer
+
+---@class LendingAdView
+---@field busy boolean
+---@field available boolean
+---@field cooldown number
+---@field reason string
+
+---@class LendingModel
+---@field screen string
+---@field profile LendingProfile
+---@field state BorrowGameState?
+---@field notice string
+---@field saveWarning string
+---@field soundWarning string
+---@field ad LendingAdView
+
+-- 当前SDK文档已公开此方法；旧版类型库尚未收录广告字段。
+---@class SDK
+---@field ShowRewardVideoAd fun(self:SDK, callback:fun(result:table)):boolean
 
 -- 内容为JSON；无扩展名的隔离存档槽位不是构建资产路径。
 local SAVE_FILES = { "street_lending_slot_a", "street_lending_slot_b" }
 local CLOUD_KEY = "street_lending_v1"
-local model_ = {
-    screen = "home", profile = { records = {}, completed = 0, sound = true },
-    notice = "", saveWarning = "",
-}
+---@type LendingModel
+local model_
 local actions_ = {}
 ---@type {model:table, actions:table}?
 LendingApp = nil
@@ -40,14 +67,46 @@ local confirmation_ = nil
 local audioScene_ = nil
 ---@type SoundSource?
 local soundSource_ = nil
+---@type table<string, Sound?>
 local sounds_ = {}
+---@type table?
+local ads_ = nil
+---@type fun()
+local Render
 
 local function Integer(value, low, high)
     return type(value) == "number" and value % 1 == 0 and value >= low and value <= high
 end
 
+---@return LendingProfile
 local function DefaultProfile()
-    return { records = {}, completed = 0, sound = true }
+    return {
+        records = {}, completed = 0, sound = true, objectives = {}, neighbors = {},
+        tutorialSeen = false, lastRewardAt = 0,
+    }
+end
+
+model_ = {
+    screen = "home", profile = DefaultProfile(),
+    notice = "", saveWarning = "", soundWarning = "",
+    ad = { busy = false, available = false, cooldown = 0, reason = "" },
+}
+
+local function CurrentState()
+    return model_.state
+end
+
+-- 比较已规范化的值，新增进度字段也参与云端冲突判断。
+local function SameValue(left, right)
+    if type(left) ~= type(right) then return false end
+    if type(left) ~= "table" then return left == right end
+    for key, value in pairs(left) do
+        if not SameValue(value, right[key]) then return false end
+    end
+    for key in pairs(right) do
+        if left[key] == nil then return false end
+    end
+    return true
 end
 
 local function DecodeEnvelope(value)
@@ -56,7 +115,7 @@ local function DecodeEnvelope(value)
         if not ok then return nil end
         value = decoded
     end
-    if type(value) ~= "table" or value.version ~= 1
+    if type(value) ~= "table" or (value.version ~= 1 and value.version ~= 2)
         or not Integer(value.sequence, 0, 2147483646)
         or not Integer(value.runId, 0, 2147483646)
         or not Integer(value.recordedRun, 0, value.runId)
@@ -66,7 +125,17 @@ local function DecodeEnvelope(value)
         or not Integer(source.completed, 0, 1000000) then return nil end
     local profile = DefaultProfile()
     profile.sound, profile.completed = source.sound, source.completed
+    if value.version == 1 then
+        profile.tutorialSeen = value.runId > 0 or source.completed > 0
+    else
+        if type(source.objectives) ~= "table" or type(source.neighbors) ~= "table"
+            or type(source.tutorialSeen) ~= "boolean"
+            or not Integer(source.lastRewardAt, 0, 4102444800) then return nil end
+        profile.tutorialSeen, profile.lastRewardAt = source.tutorialSeen, source.lastRewardAt
+    end
+    local requests = {}
     for _, scenario in ipairs(Content.scenarios) do
+        for _, request in ipairs(scenario.requests) do requests[request.id] = request end
         local record = source.records[scenario.id]
         if record ~= nil then
             if type(record) ~= "table" or not Integer(record.best, 0, scenario.maximum)
@@ -77,6 +146,34 @@ local function DecodeEnvelope(value)
                 best = record.best, stars = record.stars, attempts = record.attempts,
             }
         end
+        local goals = value.version == 2 and source.objectives[scenario.id] or nil
+        if goals ~= nil then
+            if type(goals) ~= "table" then return nil end
+            local clean = {}
+            for _, objective in ipairs(scenario.objectives) do
+                if goals[objective.id] ~= nil and type(goals[objective.id]) ~= "boolean" then return nil end
+                if goals[objective.id] then clean[objective.id] = true end
+            end
+            if next(clean) then profile.objectives[scenario.id] = clean end
+        end
+    end
+    if value.version == 2 then
+        for _, personId in ipairs(Content.peopleOrder) do
+            local record = source.neighbors[personId]
+            if record ~= nil then
+                if type(record) ~= "table" or not Integer(record.completed, 1, 12000000)
+                    or type(record.items) ~= "table" then return nil end
+                local clean, count = { completed = record.completed, items = {} }, 0
+                for requestId, complete in pairs(record.items) do
+                    local request = requests[requestId]
+                    if complete ~= true or not request or request.person ~= personId then return nil end
+                    clean.items[requestId] = true
+                    count = count + 1
+                end
+                if count > record.completed then return nil end
+                profile.neighbors[personId] = clean
+            end
+        end
     end
     local state
     if value.game ~= nil and value.game ~= cjson.null then
@@ -84,7 +181,7 @@ local function DecodeEnvelope(value)
         if not state then return nil end
     end
     return {
-        version = 1, sequence = value.sequence, runId = value.runId,
+        version = 2, sequence = value.sequence, runId = value.runId,
         recordedRun = value.recordedRun, profile = profile, state = state,
     }
 end
@@ -98,32 +195,13 @@ end
 -- 只比较经校验后的存档内容，不依赖 JSON 对象的键顺序。
 local function SameProgress(remote)
     if runId_ ~= remote.runId or recordedRun_ ~= remote.recordedRun
-        or model_.profile.sound ~= remote.profile.sound
-        or model_.profile.completed ~= remote.profile.completed then return false end
-    for _, scenario in ipairs(Content.scenarios) do
-        local current = model_.profile.records[scenario.id]
-        local received = remote.profile.records[scenario.id]
-        if not current or not received then
-            if current ~= received then return false end
-        elseif current.best ~= received.best or current.stars ~= received.stars
-            or current.attempts ~= received.attempts then return false end
-    end
+        or not SameValue(model_.profile, remote.profile) then return false end
     local currentState = model_.state
     local remoteState = remote.state
     if not currentState or not remoteState then return currentState == remoteState end
     local current = Game.Snapshot(currentState)
     local received = Game.Snapshot(remoteState)
-    if not current or not received or current.scenarioId ~= received.scenarioId
-        or current.round ~= received.round or #current.decisions ~= #received.decisions then
-        return false
-    end
-    for index, decision in ipairs(current.decisions) do
-        local other = received.decisions[index]
-        if not other or decision.requestId ~= other.requestId or decision.lent ~= other.lent then
-            return false
-        end
-    end
-    return true
+    return current ~= nil and received ~= nil and SameValue(current, received)
 end
 
 local function ReadLocal(path)
@@ -171,10 +249,15 @@ local function Save()
     end
     sequence_ = sequence_ + 1
     local envelope = {
-        version = 1, sequence = sequence_, runId = runId_, recordedRun = recordedRun_,
+        version = 2, sequence = sequence_, runId = runId_, recordedRun = recordedRun_,
         profile = model_.profile, game = snapshot,
     }
-    local encoded = cjson.encode(envelope)
+    local encodedOk, encoded = pcall(cjson.encode, envelope)
+    if not encodedOk or type(encoded) ~= "string" then
+        model_.saveWarning = "本局调整已生效，但进度暂未保存，请先不要退出。"
+        dirty_ = true
+        return false
+    end
     local target = SAVE_FILES[sequence_ % 2 + 1]
     if not target then return false end
     local localOk = pcall(function()
@@ -235,7 +318,6 @@ local function LoadCloud()
     cloudGeneration_ = cloudGeneration_ + 1
     local generation = cloudGeneration_
     cloudLoading_, cloudElapsed_ = true, 0
-    local initialSequence = sequence_
     model_.notice = "正在读取值班记录，马上就好。"
     local ok = pcall(function()
         clientCloud:Get(CLOUD_KEY, {
@@ -244,8 +326,7 @@ local function LoadCloud()
                 local remote = type(values) == "table" and DecodeEnvelope(values[CLOUD_KEY]) or nil
                 cloudLoading_ = false
                 local equalSequenceConflict = remote and remote.sequence == sequence_ and not SameProgress(remote)
-                if sequence_ == initialSequence and remote
-                    and (remote.sequence > sequence_ or equalSequenceConflict) then
+                if remote and (remote.sequence > sequence_ or equalSequenceConflict) then
                     if sequence_ > 0 or equalSequenceConflict then
                         confirmation_ = { kind = "cloud", envelope = remote }
                         model_.notice = "发现另一份云端记录，请选择保留哪一份。"
@@ -281,9 +362,40 @@ local function LoadCloud()
 end
 
 local function PlaySound(name)
-    if model_.profile.sound and soundSource_ and sounds_[name] then
-        soundSource_:Play(sounds_[name], 0, 0.28)
+    local source, sound = soundSource_, sounds_[name]
+    if model_.profile.sound and source and sound then
+        local played = pcall(function() source:Play(sound, 0, 0.28) end)
+        model_.soundWarning = played and "" or "音效暂不可用，借还记录仍会正常保存。"
+        if not played then dirty_ = true end
     end
+end
+
+local function UpdateAdState()
+    local busy = ads_ ~= nil and ads_:IsBusy()
+    local remaining = math.max(0, math.min(90, 90 - (os.time() - model_.profile.lastRewardAt)))
+    if model_.profile.lastRewardAt == 0 then remaining = 0 end
+    if ads_ then remaining = math.max(remaining, ads_:RemainingCooldown()) end
+    remaining = math.ceil(remaining)
+    ---@type boolean, string?
+    local available, reason = false, "先完成一班，再使用激励重排。"
+    local state = CurrentState()
+    if model_.profile.completed > 0 and state then
+        available, reason = Game.CanReplan(state, true)
+    end
+    if available and remaining > 0 then
+        available, reason = false, "稍等 " .. remaining .. " 秒后可再次观看。"
+    end
+    if busy then available, reason = false, "正在播放，完整看完后重新安排本时段。" end
+    if model_.ad.busy ~= busy or model_.ad.available ~= available
+        or model_.ad.cooldown ~= remaining or model_.ad.reason ~= (reason or "") then
+        model_.ad.busy, model_.ad.available = busy, available
+        model_.ad.cooldown, model_.ad.reason = remaining, reason or ""
+        dirty_ = true
+    end
+end
+
+local function CancelAd()
+    if ads_ then ads_:Cancel("本次奖励已取消，当前借还记录没有变化。") end
 end
 
 local function RecordResult()
@@ -295,6 +407,17 @@ local function RecordResult()
         best = math.max(old.best, result.completed), stars = math.max(old.stars, result.stars),
         attempts = old.attempts + 1,
     }
+    local goals = model_.profile.objectives[key] or {}
+    for _, objective in ipairs(result.objectives) do
+        if objective.complete then goals[objective.id] = true end
+    end
+    if next(goals) then model_.profile.objectives[key] = goals end
+    for _, neighbor in ipairs(result.neighborRecords) do
+        local record = model_.profile.neighbors[neighbor.personId] or { completed = 0, items = {} }
+        record.completed = record.completed + neighbor.count
+        for _, requestId in ipairs(neighbor.requestIds) do record.items[requestId] = true end
+        model_.profile.neighbors[neighbor.personId] = record
+    end
     model_.profile.completed = model_.profile.completed + 1
     recordedRun_ = runId_
 end
@@ -302,15 +425,18 @@ end
 local function StartShift(id)
     local state, message = Game.New(id)
     if not state then model_.notice = message or "这个班次暂不可用。"; dirty_ = true; return end
+    CancelAd()
     runId_ = runId_ + 1
-    model_.state, model_.screen, model_.notice = state, "game", state.status
+    model_.state = state
+    model_.screen = model_.profile.tutorialSeen and "game" or "tutorial"
+    model_.notice = state.status
     confirmation_ = nil
     PlaySound("page")
     Save()
 end
 
 function actions_.start(id)
-    if stopped_ or cloudLoading_ or confirmation_ then return end
+    if stopped_ or cloudLoading_ or confirmation_ or (ads_ and ads_:IsBusy()) then return end
     if model_.state and not model_.state.finished then
         confirmation_ = { kind = "new", scenarioId = id }
         dirty_ = true
@@ -320,25 +446,36 @@ function actions_.start(id)
 end
 
 function actions_.continueGame()
+    if stopped_ then return end
+    CancelAd()
     model_.screen = model_.state and (model_.state.finished and "result" or "game") or "home"
+    if model_.state and not model_.state.finished and not model_.profile.tutorialSeen then
+        model_.screen = "tutorial"
+    end
     model_.notice = ""
     dirty_ = true
 end
 
 function actions_.home()
+    if stopped_ then return end
+    CancelAd()
     model_.screen, model_.notice = "home", ""
     dirty_ = true
 end
 
 function actions_.show(screen)
-    if screen == "rules" or screen == "schedule" or screen == "settings" or screen == "result" then
+    if stopped_ then return end
+    if screen == "rules" or screen == "schedule" or screen == "settings" or screen == "result"
+        or screen == "neighbors" or screen == "records" or screen == "history" or screen == "tutorial" then
+        CancelAd()
         model_.screen, model_.notice = screen, ""
         dirty_ = true
     end
 end
 
 local function Decide(lend, requestId)
-    if cloudLoading_ or confirmation_ or not model_.state then return end
+    if stopped_ or cloudLoading_ or confirmation_ or not model_.state
+        or (ads_ and ads_:IsBusy()) then return end
     local ok, message = Game.Decide(model_.state, lend, requestId)
     model_.notice = message or ""
     if ok then PlaySound(lend and "lend" or "page"); Save() end
@@ -349,7 +486,8 @@ function actions_.lend(requestId) Decide(true, requestId) end
 function actions_.decline(requestId) Decide(false, requestId) end
 
 function actions_.nextRound()
-    if cloudLoading_ or confirmation_ or not model_.state then return end
+    if stopped_ or cloudLoading_ or confirmation_ or not model_.state
+        or (ads_ and ads_:IsBusy()) then return end
     local ok, message = Game.NextRound(model_.state)
     model_.notice = message or ""
     if ok then
@@ -365,15 +503,75 @@ function actions_.nextRound()
     dirty_ = true
 end
 
+function actions_.finishTutorial()
+    if stopped_ or cloudLoading_ or confirmation_ then return end
+    model_.profile.tutorialSeen = true
+    model_.screen = model_.state and (model_.state.finished and "result" or "game") or "home"
+    model_.notice = ""
+    PlaySound("page")
+    Save()
+end
+
+function actions_.replan()
+    if stopped_ or cloudLoading_ or confirmation_ or not model_.state
+        or (ads_ and ads_:IsBusy()) then return end
+    local ok, message = Game.Replan(model_.state, false)
+    model_.notice = message or ""
+    if ok then PlaySound("page"); Save() end
+    dirty_ = true
+end
+
+function actions_.rewardReplan()
+    if stopped_ or cloudLoading_ or confirmation_ or not model_.state or not ads_ then return end
+    UpdateAdState()
+    if not model_.ad.available then model_.notice = model_.ad.reason; dirty_ = true; return end
+    local state, run = model_.state, runId_
+    local snapshot = Game.Snapshot(state)
+    if not snapshot then return end
+    -- 先绘制等待状态，再由SDK在该根上展示广告；播放期间不替换UI根。
+    model_.ad.busy = true
+    Render()
+    local requested, message = ads_:Request({
+        isValid = function()
+            return IsRunning() and CurrentState() == state and runId_ == run
+                and model_.screen == "game" and SameValue(Game.Snapshot(state), snapshot)
+                and Game.CanReplan(state, true)
+        end,
+        grantReward = function()
+            local ok, rewardMessage = Game.Replan(state, true)
+            if not ok then return false end
+            model_.profile.lastRewardAt = os.time()
+            model_.notice = rewardMessage or "本时段已重新安排。"
+            PlaySound("page")
+            Save()
+            return true
+        end,
+        onSuccess = function() dirty_ = true end,
+        onFailure = function(reason)
+            if not IsRunning() then return end
+            model_.notice = reason
+            dirty_ = true
+        end,
+        onBusyChanged = function(busy)
+            if not IsRunning() then return end
+            model_.ad.busy = busy
+            dirty_ = true
+        end,
+    })
+    if not requested then model_.notice = message or "广告暂不可用，请稍后重试。" end
+    UpdateAdState()
+    dirty_ = true
+end
+
 function actions_.toggleSound()
-    if cloudLoading_ or confirmation_ then return end
+    if stopped_ or cloudLoading_ or confirmation_ or (ads_ and ads_:IsBusy()) then return end
     model_.profile.sound = not model_.profile.sound
     Save()
     if model_.profile.sound then PlaySound("page") end
 end
 
 function actions_.resetProgress()
-    if cloudLoading_ or confirmation_ then return end
+    if stopped_ or cloudLoading_ or confirmation_ or (ads_ and ads_:IsBusy()) then return end
     confirmation_ = { kind = "reset" }
     dirty_ = true
 end
@@ -399,11 +597,13 @@ local function ConfirmOverlay()
         if pending.kind == "new" then
             StartShift(pending.scenarioId)
         elseif pending.kind == "cloud" then
+            CancelAd()
             ApplyEnvelope(pending.envelope)
             cloudQueue_, cloudReady_ = "", true
             model_.screen, model_.notice = "home", "已恢复云端值班记录。"
             Save()
         else
+            CancelAd()
             model_.state, model_.profile = nil, DefaultProfile()
             recordedRun_ = runId_
             model_.screen, model_.notice = "home", "已清除本游戏的值班记录。"
@@ -434,7 +634,7 @@ local function ConfirmOverlay()
     }
 end
 
-local function Render()
+Render = function()
     local root = View.Build(model_, actions_)
     if confirmation_ then root:AddChild(ConfirmOverlay()) end
     UI.SetRoot(root, true)
@@ -446,6 +646,12 @@ function Start()
     stopped_ = false
     UI.Init({ theme = "default-taptap", scale = UI.Scale.DEFAULT })
     LoadLocal()
+    ads_ = Ads.New({
+        show = function(callback) return sdk:ShowRewardVideoAd(callback) end,
+        now = function() return time.elapsedTime end,
+        cooldown = 90, timeout = 180,
+    })
+    UpdateAdState()
     audioScene_ = Scene()
     soundSource_ = audioScene_:CreateChild("InterfaceSounds"):CreateComponent("SoundSource")
     for _, name in ipairs({ "page", "lend", "finish" }) do
@@ -462,6 +668,8 @@ end
 function HandleUpdate(_eventType, eventData)
     if not IsRunning() then return end
     local dt = eventData:GetFloat("TimeStep")
+    if ads_ then ads_:Tick() end
+    UpdateAdState()
     if cloudLoading_ then
         cloudElapsed_ = cloudElapsed_ + dt
         if cloudElapsed_ > 15 then
@@ -478,11 +686,12 @@ function HandleUpdate(_eventType, eventData)
         retryElapsed_ = retryElapsed_ + dt
         if retryElapsed_ > 8 then retryElapsed_ = 0; PumpCloud() end
     end
-    if dirty_ then Render() end
+    if dirty_ and not (ads_ and ads_:IsBusy()) then Render() end
 end
 
 function Stop()
     stopped_ = true
+    if ads_ then ads_:Stop(); ads_ = nil end
     cloudGeneration_ = cloudGeneration_ + 1
     UnsubscribeFromEvent("Update")
     if not cloudLoading_ and not (confirmation_ and confirmation_.kind == "cloud") then Save() end
